@@ -1,19 +1,25 @@
 from django.contrib.auth import get_user_model
 from rest_framework.decorators import APIView
 from user_profile.serializers import UserSerializer, ProfileSerializer
-from django.contrib.auth import get_user_model
+# from django.contrib.auth import get_user_model
+from .models import Profile
 from rest_framework.response import Response
-from rest_framework import permissions, generics
-
-
-User = get_user_model()
+from rest_framework import permissions, generics, viewsets
 
 
 class GetUserView(generics.RetrieveAPIView):
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-    serializer_class = ProfileSerializer
-    queryset = get_user_model().objects.all()
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = UserSerializer
+    
+    def get_queryset(self):
+        queryset = get_user_model().objects.filter(id=self.kwargs.get('pk'))
+        return queryset
 
+
+class ProfileViewSet(viewsets.ModelViewSet):
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = ProfileSerializer
+    queryset = Profile.objects.all()
 
 
 class CreateUserView(APIView):
